@@ -1,0 +1,15 @@
+modin[all]==0.30.1
+requests==2.32.3
+aiohttp==3.9.5
+openpyxl==3.1.4
+pyxlsb==1.0.10
+xlrd==2.0.1
+odfpy==1.4.1
+
+SQLAlchemy==2.0.30
+PyMySQL==1.1.1
+psycopg[binary,pool]==3.1.19
+oracledb==2.2.1
+pymssql==2.3.0
+
+asciinet==0.3.1
