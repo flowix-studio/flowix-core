@@ -1,4 +1,44 @@
-# -*- coding: utf-8 -*-
+<h1 align="center">
+    Flowix
+</h1>
+<p align="center">
+    FlowBased-Driven Interation Tool with Python
+</p>
+<br/>
+
+<div align="center">
+    <img src="https://img.shields.io/badge/python-3.11%20%7C%203.12-blue" />
+    <br>
+    <a href="https://github.com/flowix-studio/Flowix-Core/blob/main/LICENSE">
+        <img src="https://img.shields.io/github/license/flowix-studio/Flowix-Core.svg" alt="GPL-3.0 License" />
+    </a>
+    <a href="https://pypi.org/project/nodered.py/">
+        <img src="https://img.shields.io/pypi/v/flowix.svg" alt="pypi" />
+    </a>
+</div><br><br>
+
+## 🛠️ Features
+- **Node-Based Workflow Execution**: Create and manage workflows using nodes.
+- **Workspace Management**: Utilize workspaces to organize and execute flows.
+- **Componentized Workflow**: Execute workflows as components, similar to nodes.
+- **Extensible Architecture**: Easily extend and customize the toolkit for specific needs.
+
+<br>
+
+## 💿 Installation
+- install from git(latest)
+```bash
+pip install git@github.com:flowix-studio/flowix-core.git
+```
+- pypi
+    - pip package is not registered.
+
+<br>
+
+## 📑 Usage
+To use Flowix-Core, you can create and execute workflows using nodes. Below is a simple example:
+
+```python
 from flowix import (
     Workspace, Workflow,
     StartNode,
@@ -6,39 +46,37 @@ from flowix import (
     ExecNode, DataframeNode, DatabaseNode, ScriptNode, DebugNode
 )
 
+workspace = Workspace()
 
-if __name__ == "__main__":
-    workspace = Workspace()
-    
-    workflow = Workflow(workspace)
+workflow = Workflow(workspace)
 
-    # start node
-    start_node = StartNode(workflow)
+# start node
+start_node = StartNode(workflow)
 
-    # dataframe node
-    dataframe_node = DataframeNode(workflow)
-    dataframe_node.parameters["mode"] = "file"
-    dataframe_node.parameters["file_type"] = "json"
-    dataframe_node.parameters["source"] = "https://jsonplaceholder.typicode.com/posts"
+# dataframe node
+dataframe_node = DataframeNode(workflow)
+dataframe_node.parameters["mode"] = "file"
+dataframe_node.parameters["file_type"] = "json"
+dataframe_node.parameters["source"] = "https://jsonplaceholder.typicode.com/posts"
 
-    # for node
-    for_node = ForNode(workflow)
-    for_node.parameters["max_iter"] = 2
-    for_node.parameters["mode"] = "payload"
-    for_node.parameters["source"] = "df"
-    # debug node
-    debug_node = DebugNode(workflow)
-    debug_node.parameters["object"] = "message.payload['for_iter']"
-    
-    # connect nodes
-    start_node.outputs["output"].connect(dataframe_node.inputs["input"])
-    dataframe_node.outputs["output"].connect(for_node.inputs["input"])
-    for_node.outputs["output"].connect(debug_node.inputs["input"])
-    
-    # check current connections
-    workflow.draw()
-    # looks maybe as below
-    """
+# for node
+for_node = ForNode(workflow)
+for_node.parameters["max_iter"] = 2
+for_node.parameters["mode"] = "payload"
+for_node.parameters["source"] = "df"
+# debug node
+debug_node = DebugNode(workflow)
+debug_node.parameters["object"] = "message.payload['for_iter']"
+
+# connect nodes
+start_node.outputs["output"].connect(dataframe_node.inputs["input"])
+dataframe_node.outputs["output"].connect(for_node.inputs["input"])
+for_node.outputs["output"].connect(debug_node.inputs["input"])
+
+# check current connections
+workflow.draw()
+# looks maybe as below
+"""
   ┌───────────────┐   
   │StartNode_3da4d│   
   └────────┬──────┘   
@@ -59,10 +97,10 @@ if __name__ == "__main__":
   └───────────────┘
 """
 
-    # execute workflow
-    workflow.execute()
-    # looks maybe as below
-    """
+# execute workflow
+workflow.execute()
+# looks maybe as below
+"""
 {
     "userId": 1,
     "id": 1,
@@ -83,10 +121,10 @@ if __name__ == "__main__":
 }
 """
 
-    # print history
-    workflow.history.pprint()
-    # looks maybe as below
-    """
+# print history
+workflow.history.pprint()
+# looks maybe as below
+"""
 [History of Workflow(c8293)]
 [
     {
@@ -168,3 +206,14 @@ if __name__ == "__main__":
     }
 ]
 """
+```
+<br>
+
+## 🌲 Project Structure
+- `flowix/`: Core library containing essential modules and components.
+- `tests/`: Folder containing test cases and usage examples.
+
+<br>
+
+## 📧 Contact
+- Feel free to contact at "flowix.app@gmail.com"
