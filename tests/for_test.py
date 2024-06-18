@@ -17,18 +17,18 @@ if __name__ == "__main__":
 
     # dataframe node
     dataframe_node = DataframeNode(workflow)
-    dataframe_node.parameters["mode"] = "file"
-    dataframe_node.parameters["file_type"] = "json"
-    dataframe_node.parameters["source"] = "https://jsonplaceholder.typicode.com/posts"
+    dataframe_node.parameters.mode = "file"
+    dataframe_node.parameters.file_type = "json"
+    dataframe_node.parameters.source = "https://jsonplaceholder.typicode.com/posts"
 
     # for node
     for_node = ForNode(workflow)
-    for_node.parameters["max_iter"] = 2
-    for_node.parameters["mode"] = "payload"
-    for_node.parameters["source"] = "df"
+    for_node.parameters.max_iter = 2
+    for_node.parameters.mode = "payload"
+    for_node.parameters.source = "df"
     # debug node
     debug_node = DebugNode(workflow)
-    debug_node.parameters["object"] = "message.payload['for_iter']"
+    debug_node.parameters.object = "message.payload['for_iter']"
     
     # connect nodes
     start_node.outputs["output"].connect(dataframe_node.inputs["input"])

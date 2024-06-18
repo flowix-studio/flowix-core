@@ -14,22 +14,22 @@ if __name__ == "__main__":
 
     # start node
     start_node = StartNode(workflow)
-    start_node.parameters["payload"] = { "num": 0 }
+    start_node.parameters.payload = { "num": 0 }
 
     # while node
     while_node = WhileNode(workflow)
     # script node(while)
     script_node = ScriptNode(workflow)
-    script_node.parameters["script"] = """
+    script_node.parameters.script = """
 message.payload["num"] += 1
 
 return message
 """
     # if node
     if_node = IfNode(workflow)
-    if_node.parameters["source"] = "num"
-    if_node.parameters["separator"] = ">="
-    if_node.parameters["target"] = 2
+    if_node.parameters.source = "num"
+    if_node.parameters.separator = ">="
+    if_node.parameters.target = 2
     # break node
     break_node = BreakNode(workflow)
 

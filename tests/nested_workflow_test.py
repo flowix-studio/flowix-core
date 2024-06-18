@@ -9,32 +9,31 @@ from flowix import (
 
 if __name__ == "__main__":
     workspace = Workspace()
-    
+
     ## main workflow
     workflow = Workflow(workspace)
     # start node
     start_node = StartNode(workflow)
-    start_node.parameters["payload"] = { "num": 0 }
+    start_node.parameters.payload = { "num": 0 }
     # while node
     while_node = WhileNode(workflow)
-    
+
     ## nested workflow
     nested_workflow = Workflow(workflow)
     # start_node
     start_node_nf = StartNode(nested_workflow)
     # script node(while)
     script_node = ScriptNode(nested_workflow)
-    script_node.parameters["script"] = """
+    script_node.parameters.script = """
 message.payload["num"] += 1
-print(message.payload)
 
 return message
 """
     # if node
     if_node = IfNode(nested_workflow)
-    if_node.parameters["source"] = "num"
-    if_node.parameters["separator"] = ">="
-    if_node.parameters["target"] = 2
+    if_node.parameters.source = "num"
+    if_node.parameters.separator = ">="
+    if_node.parameters.target = 2
     # break node
     break_node = BreakNode(nested_workflow)
     # debug node
@@ -47,12 +46,12 @@ return message
 
     # debug node
     debug_node = DebugNode(workflow)
-    
+
     # connect nodes(main workflow)
     start_node.outputs["output"].connect(while_node.inputs["input"])
     while_node.outputs["output"].connect(nested_workflow.inputs["input"])
     nested_workflow.outputs["output"].connect(debug_node.inputs["input"])
-    
+
     # check current connections
     workflow.draw()
     # looks maybe as below

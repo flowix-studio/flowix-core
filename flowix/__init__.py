@@ -10,7 +10,7 @@ from .workspace import Workspace
 from .workflow import Workflow
 from .workflow_message import WorkflowMessage
 from .share_manager import ShareManager
-from .node import Node
+from .node import Node, NodeParameters
 from .nodes.start_node import StartNode
 from .nodes.cond_nodes import IfNode, ForNode, WhileNode, BreakNode
 from .nodes.exec_node import ExecNode
@@ -23,7 +23,7 @@ __all__ = [
     "Workspace",
     "Workflow", "WorkflowMessage",
     "ShareManager",
-    "Node",
+    "Node", "NodeParameters",
     "StartNode",
     "IfNode", "ForNode", "WhileNode", "BreakNode",
     "ExecNode", "DataframeNode", "DatabaseNode", "ScriptNode", "DebugNode"
