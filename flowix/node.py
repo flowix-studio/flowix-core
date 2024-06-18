@@ -107,6 +107,10 @@ class Node:
     @property
     def name(self) -> str:
         return self.__name
+    
+    @name.setter
+    def name(self, new_name:str):
+        self.__name = new_name
 
     @property
     def parameters(self) -> NodeParameters:

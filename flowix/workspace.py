@@ -4,10 +4,10 @@ from .workflow import Workflow
 
 
 class Workspace:
-    def __init__(self, workspace_id:str = None, workspace_name:str = None, config_db_file:str = None):
+    def __init__(self, workspace_id:str = None, workspace_name:str = None, workspace_file:str = None):
         self.__workspace_id = uuid.uuid4().hex if workspace_id is None else workspace_id
         self.__workspace_name = f"{self.__class__.__name__}_{self.__workspace_id}" if workspace_name is None else workspace_name
-        self.__config_db_file = config_db_file
+        self.__workspace_file = workspace_file
         
         self.__workflows:list[Workflow] = []
         
@@ -21,13 +21,17 @@ class Workspace:
     @property
     def name(self) -> str:
         return self.__workspace_name
+
+    @name.setter
+    def name(self, new_name:str):
+        self.__workspace_name = new_name
     
     @property
     def config_db(self) -> None | sqlite3.Connection:
-        if self.__config_db_file is None:
+        if self.__workspace_file is None:
             return None
         else:
-            return sqlite3.connect(self.__config_db_file)
+            return sqlite3.connect(self.__workspace_file)
     
     @property
     def workflows(self) -> dict[str, Workflow]:
@@ -38,21 +42,15 @@ class Workspace:
         
         
     @staticmethod
-    def create(workspace_path:str, workspace_id:str = None, workspace_name:str = None) -> "Workspace":
-        workspace_path:pathlib.Path = pathlib.Path(workspace_path).resolve()
+    def create(workspace_file:str, workspace_id:str = None, workspace_name:str = None) -> "Workspace":
+        workspace_file:pathlib.Path = pathlib.Path(workspace_file).resolve()
         workspace_id = uuid.uuid4().hex if workspace_id is None else workspace_id
 
-        if workspace_path.exists():
-            # raise error if directory already exists
-            raise FileExistsError("Cannot create Workspace into existing directory!")
-        
-        # create directory
-        os.makedirs(str(workspace_path))
-        os.makedirs(str(workspace_path.joinpath("backups")))
-        
-        # create config.db
-        config_db_file = str(workspace_path.joinpath("flowix.config"))
-        con = sqlite3.connect(config_db_file)
+        if workspace_file.exists():
+            # raise error if file already exists
+            raise FileExistsError("File exists!")
+
+        con = sqlite3.connect(str(workspace_file))
         # create tables
         con.executescript("""
 create table `config` (
@@ -70,10 +68,14 @@ create table `histories` (
     `TYPE` text not null,
     `MESSAGE` text not null
 );
+create table `backups` (
+    `ID` text not null,
+    `DUMPS` text not null
+);
 """)
 
         # create instance first
-        workspace = Workspace(workspace_id, workspace_name, config_db_file)
+        workspace = Workspace(workspace_id, workspace_name, str(workspace_file))
         
         # save id, name into config table
         con.execute(f"insert into `config` values ('ID', '{workspace_id}'), ('NAME', '{workspace.name}');")
@@ -84,16 +86,15 @@ create table `histories` (
         return workspace
     
     @staticmethod
-    def load(workspace_path:str) -> "Workspace":
-        workspace_path:pathlib.Path = pathlib.Path(workspace_path).resolve()
+    def load(workspace_file:str) -> "Workspace":
+        workspace_file:pathlib.Path = pathlib.Path(workspace_file).resolve()
 
-        # check config file exists
-        config_db_file = workspace_path.joinpath("flowix.config")
-        if not config_db_file.exists():
-            raise FileNotFoundError("Cannot load from non-flowix format directory!")
+        # check file exists
+        if not workspace_file.exists():
+            raise FileNotFoundError("File not exists!")
 
         # connect to sqlite db
-        con = sqlite3.connect(config_db_file)
+        con = sqlite3.connect(str(workspace_file))
         con.row_factory = sqlite3.Row
         # get config from table
         configs = {
@@ -107,7 +108,7 @@ create table `histories` (
         ]
 
         # create workspace from configs
-        workspace = Workspace(configs["ID"], configs["NAME"], config_db_file)
+        workspace = Workspace(configs["ID"], configs["NAME"], str(workspace_file))
         # append workflows
         for workflow_dump in workflows:
             workflow = Workflow.deserialize(workflow_dump)
@@ -126,37 +127,70 @@ create table `histories` (
 
         return workspace
     
-    def save(self, workspace_path:str):
-        workspace_path:pathlib.Path = pathlib.Path(workspace_path).resolve()
-
-        # check config file exists
-        config_db_file = workspace_path.joinpath("flowix.config")
-        if not config_db_file.exists():
-            raise FileNotFoundError("Cannot load from non-flowix format directory!")
+    def save(self) -> bool:
+        if self.__workspace_file is None:
+            return False
         
         ## replace datas
-        con = sqlite3.connect(config_db_file)
         # config
-        con.executescript(f"""
+        self.config_db.execute(f"""
 delete from `config`;
 insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
 """)
         # workflows/histories
-        con.execute("delete from `workflows`;")
-        con.execute("delete from `histories`;")
+        self.config_db.execute("delete from `workflows`;")
+        self.config_db.execute("delete from `histories`;")
+        for workflow in self.__workflows:
+            workflow.save(self.config_db, True, False)
+
+        self.config_db.commit()
+        # close connection
+        self.config_db.close()
+        
+    def save_as(self, workspace_file:str, overwrite:bool = False) -> bool:
+        workspace_file:pathlib.Path = pathlib.Path(workspace_file).resolve()
+        if not overwrite and workspace_file.exists():
+            return False
+        
+        if overwrite and workspace_file.exists():
+            os.remove(str(workspace_file))
+        
+        con = sqlite3.connect(str(workspace_file))
+        # create tables
+        con.executescript("""
+create table `config` (
+    `NAME` text primary key not null,
+    `VALUE` text not null
+);
+create table `workflows` (
+    `ID` text primary key not null,
+    `DUMPS` text not null
+);
+create table `histories` (
+    `WORKFLOW` text not null,
+    `EXEC_ID` text not null,
+    `NODE_ID` text,
+    `TYPE` text not null,
+    `MESSAGE` text not null
+);
+create table `backups` (
+    `ID` text not null,
+    `DUMPS` text not null
+);
+""")
+
+        ## insert datas
+        # config
+        con.execute(f"""
+insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
+""")
+        # workflows/histories
         for workflow in self.__workflows:
             workflow.save(con, True, False)
 
         con.commit()
         # close connection
         con.close()
-
-        # clear backup files
-        for backup_file in workspace_path.joinpath("backups").glob("*"):
-            if os.path.isfile(str(backup_file)):
-                os.remove(str(backup_file))
-            else:
-                shutil.rmtree(str(backup_file))
 
     def append_workflow(self, workflow:Workflow) -> bool:
         try:

@@ -42,6 +42,10 @@ class Workflow:
     @property
     def name(self) -> str:
         return self.__workflow_name
+    
+    @name.setter
+    def name(self, new_name:str):
+        self.__workflow_name = new_name
 
     @property
     def nodes(self) -> dict[str, Node]:
@@ -313,7 +317,7 @@ class Workflow:
 
 
     # backup/restore from pickle file
-    def backup(self, backup_file:str) -> bool:
+    def backup_to_file(self, backup_file:str) -> bool:
         try:
             if not isinstance(backup_file, pathlib.Path):
                 backup_file = pathlib.Path(backup_file).resolve()
@@ -326,9 +330,11 @@ class Workflow:
             return False
         
     @staticmethod
-    def restore(backup_file:str, remove_file:bool = False) -> "Workflow":
-        backup_file = str(pathlib.Path(backup_file).resolve())
-            
+    def restore_from_file(backup_file:str, remove_file:bool = False) -> "Workflow":
+        backup_file = pathlib.Path(backup_file).resolve()
+        if not backup_file.exists():
+            raise FileNotFoundError("backup file not exists!")
+
         with open(backup_file, "rb") as bfr:
             workflow = pickle.load(bfr)
 
@@ -336,6 +342,27 @@ class Workflow:
             os.remove(backup_file)
 
         return workflow
+    
+    def backup_to_workspace(self) -> bool:
+        if self.__workspace is None:
+            return False
+
+        try:
+            if self.__workspace.config_db.execute(f"select count(*) from `backups` where `ID`='{self.id}'").fetchone()[0] == 0:
+                self.__workspace.config_db.execute(f"insert into `backups` values ( '{self.id}', '{self.serialize()}' );")
+            else:
+                self.__workspace.config_db.execute(f"update `backups` set `DUMPS`='{self.serialize}' where `ID`='{self.id}';")
+                
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def restore_from_workspace(workspace, workflow_id:str) -> "Workflow":
+        if workspace.config_db.execute(f"select count(*) from `backups` where `ID`='{workflow_id}';").fetchone()[0] == 0:
+            raise KeyError("invalid backup id!")
+        else:
+            return Workflow.deserialize(workspace.config_db.execute(f"select `DUMPS` from `backups` where `ID`='{workflow_id}';").fetchone()[0])
 
     # serialize/deserialize from codecs string
     def serialize(self) -> str:
