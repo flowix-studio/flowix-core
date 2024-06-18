@@ -63,7 +63,7 @@ class NodeOutput:
 class Node:
     has_iter = False
 
-    def __init__(self, workflow, node_id:str = None, node_name:str = None, inputs:list[str] = [], outputs:list[str] = [], parameters:dict[str, Any] = {}):
+    def __init__(self, workflow, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, Any] = {}):
         self.__workflow = workflow
         self.__node_id = uuid.uuid4().hex[:5] if node_id is None else node_id
         self.__name = f"{self.__class__.__name__}_{self.__node_id}" if node_name is None else node_name

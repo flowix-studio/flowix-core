@@ -9,6 +9,7 @@ __version__ = "0.0.1"
 from .workspace import Workspace
 from .workflow import Workflow
 from .workflow_message import WorkflowMessage
+from .share_manager import ShareManager
 from .node import Node
 from .nodes.start_node import StartNode
 from .nodes.cond_nodes import IfNode, ForNode, WhileNode, BreakNode
@@ -21,6 +22,7 @@ from .nodes.debug_node import DebugNode
 __all__ = [
     "Workspace",
     "Workflow", "WorkflowMessage",
+    "ShareManager",
     "Node",
     "StartNode",
     "IfNode", "ForNode", "WhileNode", "BreakNode",

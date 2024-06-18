@@ -5,7 +5,7 @@ from .workflow import Workflow
 
 
 class ShareManager:
-    def __init__(self, manager_id:str):
+    def __init__(self, manager_id:str = None):
         self.__manager_id = uuid.uuid4().hex if manager_id is None else manager_id
         self.__base_url = None
         self.__token = None
@@ -28,7 +28,14 @@ class ShareManager:
             if result["state"] == "fail":
                 return []
 
-            return result["objects"]
+            return [
+                {
+                    "id": row["id"],
+                    "type": row["type"],
+                    "object": "**********"
+                }
+                for row in result["objects"]
+            ]
         except:
             return []
         
@@ -39,6 +46,8 @@ class ShareManager:
             self.__token = requests.post(base_url + "/connect").json()["token"]
 
             return True
+        except requests.exceptions.ConnectionError as e:
+            raise e
         except:
             return False
         
@@ -51,6 +60,8 @@ class ShareManager:
                 self.__base_url + "/disconnect",
                 headers = { "flowix_token": self.__token }
             ).json()["state"] == "success"
+        except requests.exceptions.ConnectionError as e:
+            raise e
         except:
             return False
         
@@ -66,6 +77,8 @@ class ShareManager:
                 },
                 headers = { "flowix_token": self.__token }
             ).json()["state"] == "success"
+        except requests.exceptions.ConnectionError as e:
+            raise e
         except:
             return False
         
@@ -75,6 +88,8 @@ class ShareManager:
                 self.__base_url + f"/delete/{self.id}/{target if isinstance(target, str) else target.id}",
                 headers = { "flowix_token": self.__token }
             ).json()["state"] == "success"
+        except requests.exceptions.ConnectionError as e:
+            raise e
         except:
             return False
         
@@ -84,19 +99,24 @@ class ShareManager:
                 self.__base_url + f"/delete/{self.id}",
                 headers = { "flowix_token": self.__token }
             ).json()["state"] == "success"
+        except requests.exceptions.ConnectionError as e:
+            raise e
         except:
             return False
     
     def load(self, target:str) -> Node | Workflow:
-        result = requests.get(
-            self.__base_url + f"/share/{self.id}/{target}",
-            headers = { "flowix_token": self.__token }
-        ).json()
+        try:
+            result = requests.get(
+                self.__base_url + f"/share/{self.id}/{target}",
+                headers = { "flowix_token": self.__token }
+            ).json()
 
-        if result["state"] == "fail":
-            raise RuntimeError(result["message"])
+            if result["state"] == "fail":
+                raise RuntimeError(result["message"])
 
-        if result["object"]["type"] == "Node":
-            return Node.deserialize(result["object"]["object"])
-        else:
-            return Workflow.deserialize(result["object"]["object"])
+            if result["object"]["type"] == "Node":
+                return Node.deserialize(result["object"]["object"])
+            else:
+                return Workflow.deserialize(result["object"]["object"])
+        except Exception as e:
+            raise e

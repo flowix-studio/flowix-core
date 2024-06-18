@@ -101,7 +101,7 @@ class ForNode(Node):
                     if check_break():
                         break
 
-                    message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.payload["is_nested_workflow"])
+                    message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.nested_state)
 
         return message
 
@@ -137,7 +137,7 @@ class WhileNode(Node):
                     if check_break():
                         break
 
-                    message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.payload["is_nested_workflow"])
+                    message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.nested_state)
 
         return message
 

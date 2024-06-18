@@ -6,11 +6,10 @@ from .workflow_connection import WorkflowConnection
 from .workflow_history import WorkflowHistory
 from .node import Node, NodeInput, NodeOutput
 from .nodes.start_node import StartNode
-from .nodes.cond_nodes import WhileNode, ForNode
 
 
 class Workflow:
-    def __init__(self, workspace, workflow_id:str = None, workflow_name:str = None):
+    def __init__(self, workspace = None, workflow_id:str = None, workflow_name:str = None):
         if isinstance(workspace, Workflow):
             self.__workflow = workspace
             self.__workspace = None
@@ -210,7 +209,7 @@ class Workflow:
             # create workflow message
             message = WorkflowMessage.new(uuid.uuid1().hex)
 
-        message.payload["is_nested_workflow"] = nested
+        message.nested_state = nested
 
         # execute start_node
         self.__state = "execute"
