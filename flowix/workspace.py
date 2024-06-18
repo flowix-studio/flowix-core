@@ -177,6 +177,12 @@ create table `backups` (
     `ID` text not null,
     `DUMPS` text not null
 );
+create table `guimaps` (
+    `WORKFLOW` text not null,
+    `NODE` text not null,
+    `X` real not null,
+    `Y` real not null
+);
 """)
 
         ## insert datas
