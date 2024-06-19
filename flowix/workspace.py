@@ -76,6 +76,12 @@ create table `backups` (
     `ID` text not null,
     `DUMPS` text not null
 );
+create table `guimaps` (
+    `WORKFLOW` text not null,
+    `NODE` text not null,
+    `X` real not null,
+    `Y` real not null
+);
 """)
 
         # create instance first
@@ -141,6 +147,8 @@ create table `backups` (
 delete from `config`;
 insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
 """)
+        self.config_db.commit()
+
         # workflows/histories
         self.config_db.execute("delete from `workflows`;")
         self.config_db.execute("delete from `histories`;")
@@ -184,14 +192,6 @@ create table `backups` (
 create table `guimaps` (
     `WORKFLOW` text not null,
     `NODE` text not null,
-    `X` real not null,
-    `Y` real not null
-);
-create table `guiconmaps` (
-    `WORKFLOW` text not null,
-    `NODE` text not null,
-    `NAME` text not null,
-    `TYPE` text not null,
     `X` real not null,
     `Y` real not null
 );
