@@ -137,7 +137,7 @@ create table `backups` (
         
         ## replace datas
         # config
-        self.config_db.execute(f"""
+        self.config_db.executescript(f"""
 delete from `config`;
 insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
 """)
