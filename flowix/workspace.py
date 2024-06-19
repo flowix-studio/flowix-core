@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sqlite3, shutil, uuid, pathlib, sqlite3, pandas as pd
+import os, sqlite3, uuid, pathlib, sqlite3, pandas as pd
 from .workflow import Workflow
 
 
@@ -239,3 +239,29 @@ insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
                 self.workflows[workflow].execute()
             except KeyError:
                 raise KeyError(f"No such workflow of id({workflow})!")
+
+    def to_script(self, import_string:str = None) -> str:
+        if self.__workspace_file is None:
+            workspace_string = f'{self.name} = {self.__class__.__name__}("{self.id}", "{self.name}")'
+        else:
+            workspace_string = f'{self.name} = {self.__class__.__name__}("{self.id}", "{self.name}", "{self.__workspace_file}")'
+
+        if len(self.__workflows) > 0:
+            workspace_string += "\n\n#### workflows\n"
+            for workflow in self.workflows.values():
+                workspace_string += f"{workflow.to_script()}"
+            
+        if import_string is None:
+            workspace_string = "from flowix import Workspace\n" + workspace_string
+        else:
+            workspace_string = import_string + "\n" + workspace_string
+            
+        return f"""# -* coding: utf-8 -*-
+# Automatically Exported Script of Flowix Workspace
+
+##### Workspace {self.name} Script
+{workspace_string}
+
+if __name__ == "__main__":
+    {self.name}.execute("all")
+"""

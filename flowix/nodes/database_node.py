@@ -97,3 +97,6 @@ class DatabaseNode(Node):
         message.payload[self.parameters.variable_name] = engine
         
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()

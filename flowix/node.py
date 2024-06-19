@@ -71,7 +71,7 @@ class NodeParameters:
                 setattr(self, name, info["default"])
 
     @property
-    def info(self) -> dict[str, type]:
+    def info(self) -> dict[str, type | dict[Literal["type", "default"], type | Any]]:
         return self.__param_info
 
 
@@ -137,6 +137,41 @@ class Node:
             copied_node.reset_parameters()
 
         return copied_node
+
+    def to_script(self, include_parameters_info:bool = False, include_extra_args = False, import_string:str = None) -> str:
+        if include_parameters_info:
+            if include_extra_args:
+                define_string = f'{self.name} = {self.__class__.__name__}({self.__workflow.name}, "{self.id}", "{self.name}", {list(self.inputs.keys())}, {list(self.outputs.keys())}, {self.parameters.info})'
+            else:
+                define_string = f'{self.name} = {self.__class__.__name__}({self.__workflow.name}, "{self.id}", "{self.name}", parameters = {self.parameters.info})'
+        else:
+            if include_extra_args:
+                define_string = f'{self.name} = {self.__class__.__name__}({self.__workflow.name}, "{self.id}", "{self.name}", {list(self.inputs.keys())}, {list(self.outputs.keys())})'
+            else:
+                define_string = f'{self.name} = {self.__class__.__name__}({self.__workflow.name}, "{self.id}", "{self.name}")'
+        
+        parameter_string = ""
+        for name, info in self.parameters.info.items():
+            param_value = getattr(self.parameters, name)
+            if param_value is not None:
+                if isinstance(info, dict):
+                    if info["type"] == str or isinstance(param_value, str):
+                        parameter_string += f'\n{self.name}.parameters.{name} = """{param_value}"""'
+                    else:
+                        parameter_string += f'\n{self.name}.parameters.{name} = {param_value}'
+                elif isinstance(info, type):
+                    if info == str or isinstance(param_value, str):
+                        parameter_string += f'\n{self.name}.parameters.{name} = """{param_value}"""'
+                    else:
+                        parameter_string += f'\n{self.name}.parameters.{name} = {param_value}'
+
+        if parameter_string != "":
+            parameter_string = "\n# parameters" + parameter_string
+
+        if import_string is None:
+            return f"# Node {self.name} Script\nfrom flowix import {self.__class__.__name__}\n" + define_string + parameter_string + "\n"
+        else:
+            return f"# Node {self.name} Script\n{import_string}\n" + define_string + parameter_string + "\n"
 
     # serialize/deserialize from codecs string
     def serialize(self) -> str:

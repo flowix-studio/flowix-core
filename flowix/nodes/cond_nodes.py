@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import modin.pandas, pandas
-from typing import Literal, Iterable
+from typing import Any, Literal, Iterable
 from ..node import Node, NodeParameters
 from ..workflow_message import WorkflowMessage
 
@@ -14,7 +14,7 @@ class IfNodeParameters(NodeParameters):
     """
     source:str
     separator:str
-    target:str
+    target:Any
 
 class IfNode(Node):
     """
@@ -24,7 +24,7 @@ class IfNode(Node):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output1", "output2" ], {
             "source": str,
             "separator": { "type": str, "default": "==" },
-            "target": str
+            "target": Any
         })
     
     @property
@@ -41,12 +41,15 @@ class IfNode(Node):
             source = message.payload[source_name]
         except KeyError:
             raise KeyError("invalid source name!")
-        
+
         cond_result = eval(f"source {self.parameters.separator} self.parameters.target")
         self.outputs["output1"].enabled = cond_result
         self.outputs["output2"].enabled = not cond_result
 
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()
 
 class ForNodeParameters(NodeParameters):
     """
@@ -130,6 +133,9 @@ class ForNode(Node):
                     message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.nested_state)
 
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()
 
 class WhileNode(Node):
     """
@@ -164,6 +170,9 @@ class WhileNode(Node):
                     message = self.workflow.execute_single_node(message.id, message, node_input.node, self, nested = message.nested_state)
 
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()
 
 class BreakNode(Node):
     """
@@ -176,3 +185,6 @@ class BreakNode(Node):
         message.cond_state["loop_break"] = True
 
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()

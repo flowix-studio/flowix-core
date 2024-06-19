@@ -43,3 +43,6 @@ class DebugNode(Node):
                 pprint.pp(object, indent = self.parameters.indent)
                 
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()

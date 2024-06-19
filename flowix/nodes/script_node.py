@@ -38,3 +38,6 @@ def fn_compute(message):
             return message
         else:
             return m
+        
+    def to_script(self) -> str:
+        return super().to_script()

@@ -315,6 +315,28 @@ class Workflow:
 
         print(graph_to_ascii(graph))
 
+    def to_script(self, import_string:str = None) -> str:
+        if self.__workspace is None and self.__workflow is None:
+            workflow_string = f'{self.name} = {self.__class__.__name__}(None, "{self.id}", "{self.name}")'
+        elif self.__workspace is not None:
+            workflow_string = f'{self.name} = {self.__class__.__name__}({self.__workspace.name}, "{self.id}", "{self.name}")'
+        elif self.__workflow is not None:
+            workflow_string = f'{self.name} = {self.__class__.__name__}({self.__workflow.name}, "{self.id}", "{self.name}")'
+
+        if len(self.__nodes) > 0:
+            workflow_string += "\n## nodes\n"
+            for node in self.nodes.values():
+                workflow_string += f"{node.to_script()}"
+
+        if len(self.connections) > 0:
+            workflow_string += "## connections"
+            for connection in self.connections:
+                workflow_string += f'\n{connection["from"]["node"]["name"]}.outputs["{connection["from"]["name"]}"].connect({connection["to"]["node"]["name"]}.inputs["{connection["to"]["name"]}"])'
+
+        if import_string is None:
+            return f"### Workflow {self.name} Script\nfrom flowix import Workflow\n" + workflow_string + "\n\n"
+        else:
+            return f"### Workflow {self.name} Script\n{import_string}\n" + workflow_string + "\n\n"
 
     # backup/restore from pickle file
     def backup_to_file(self, backup_file:str) -> bool:

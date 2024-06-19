@@ -26,3 +26,6 @@ class StartNode(Node):
         message.payload.update(self.parameters.payload)
 
         return message
+
+    def to_script(self) -> str:
+        return super().to_script()

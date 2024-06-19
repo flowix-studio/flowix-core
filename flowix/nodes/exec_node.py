@@ -55,3 +55,6 @@ class ExecNode(Node):
         ]
         
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()

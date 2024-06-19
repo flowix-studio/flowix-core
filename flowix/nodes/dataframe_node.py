@@ -92,3 +92,6 @@ class DataframeNode(Node):
             message.payload[var_name] = pd.read_sql(query, message.payload[engine_name])
         
         return message
+    
+    def to_script(self) -> str:
+        return super().to_script()
