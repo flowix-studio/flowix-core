@@ -1,3 +1,3 @@
 #!/bin/sh
 
-flowix create ./test2.workspace
+flowix create ./test2.flowix

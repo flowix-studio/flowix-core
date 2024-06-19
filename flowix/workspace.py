@@ -183,6 +183,14 @@ create table `guimaps` (
     `X` real not null,
     `Y` real not null
 );
+create table `guiconmaps` (
+    `WORKFLOW` text not null,
+    `NODE` text not null,
+    `NAME` text not null,
+    `TYPE` text not null,
+    `X` real not null,
+    `Y` real not null
+);
 """)
 
         ## insert datas
