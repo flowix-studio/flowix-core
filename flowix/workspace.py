@@ -17,7 +17,11 @@ class Workspace:
     @property
     def id(self) -> str:
         return self.__workspace_id
-    
+
+    @id.setter
+    def id(self, new_id:str):
+        self.__workspace_id = new_id
+
     @property
     def name(self) -> str:
         return self.__workspace_name

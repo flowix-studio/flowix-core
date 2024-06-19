@@ -38,6 +38,10 @@ class Workflow:
     @property
     def id(self) -> str:
         return self.__workflow_id
+
+    @id.setter
+    def id(self, new_id:str):
+        self.__workflow_id = new_id
     
     @property
     def name(self) -> str:
