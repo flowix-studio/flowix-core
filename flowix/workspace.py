@@ -142,18 +142,17 @@ create table `guimaps` (
             return False
         
         ## replace datas
-        # config
-        self.config_db.executescript(f"""
-delete from `config`;
-insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
-""")
-        self.config_db.commit()
-
         # workflows/histories
         self.config_db.execute("delete from `workflows`;")
         self.config_db.execute("delete from `histories`;")
         for workflow in self.__workflows:
             workflow.save(self.config_db, True, False)
+
+        # config
+        self.config_db.executescript(f"""
+delete from `config`;
+insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
+""")
 
         self.config_db.commit()
         # close connection
