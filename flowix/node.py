@@ -78,10 +78,10 @@ class NodeParameters:
 class Node:
     has_iter = False
 
-    def __init__(self, workflow, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, type | dict[Literal["type", "default"], Any]] = {}):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, type | dict[Literal["type", "default"], Any]] = {}):
         self.__workflow = workflow
-        self.__node_id = uuid.uuid4().hex[:5] if node_id is None else node_id
-        self.__name = f"{self.__class__.__name__}_{self.__node_id}" if node_name is None else node_name
+        self.__node_id = node_id or self.__create_id
+        self.__name = node_name or f"{self.__class__.__name__}_{self.__node_id}"
 
         self.__parameters:NodeParameters = NodeParameters(parameters)
         self.__init_parameters = copy.deepcopy(self.__parameters)
@@ -94,7 +94,16 @@ class Node:
             for output_name in outputs
         }
 
-        workflow.append_node(self)
+        if workflow is not None:
+            workflow.append_node(self)
+
+    def __create_id(self) -> str:
+        nid = uuid.uuid4().hex[:5]
+        # check duplicated
+        if nid in self.__workflow.nodes.keys():
+            return self.__create_id
+        
+        return nid
 
     @property
     def workflow(self):

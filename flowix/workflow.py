@@ -17,8 +17,8 @@ class Workflow:
             self.__workspace = workspace
             self.__workflow = None
 
-        self.__workflow_id = uuid.uuid4().hex[:5] if workflow_id is None else workflow_id
-        self.__workflow_name = f"{self.__class__.__name__}_{self.__workflow_id}" if workflow_name is None else workflow_name
+        self.__workflow_id = workflow_id or self.__create_id()
+        self.__workflow_name = workflow_name or f"{self.__class__.__name__}_{self.__workflow_id}"
         self.__nodes:list[Node] = []
         self.__history = WorkflowHistory(self)
 
@@ -31,6 +31,18 @@ class Workflow:
             
         if self.__workflow is not None:
             self.__workflow.append_node(self)
+
+    def __create_id(self) -> str:
+        wid = uuid.uuid4().hex[:5]
+        # check duplicated
+        if self.__workspace is not None:
+            if wid in self.__workspace.workflows.keys():
+                return self.__create_id()
+        elif self.__workflow is not None:
+            if wid in self.__workflow.nodes.keys():
+                return self.__create_id()
+        
+        return wid
 
     def __str__(self) -> str:
         return f"<{self.__class__.__name__} id:{self.id} name:{self.name}>"
