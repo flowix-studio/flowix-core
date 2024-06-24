@@ -78,7 +78,7 @@ class ForNode(Node):
     """
     has_iter = False
 
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
             "variable_name": { "type": str, "default": "for_iter"},
             "mode": { "type": str, "default": "payload"},
@@ -143,7 +143,7 @@ class WhileNode(Node):
     """
     has_iter = False
 
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ])
 
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
@@ -178,7 +178,7 @@ class BreakNode(Node):
     """
     Node for break for loop node
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ])
 
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
