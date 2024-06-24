@@ -40,7 +40,7 @@ class DataframeNode(Node):
     """
     Node to convert datas from source
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
             "variable_name": { "type": str, "default": "df"},
             "module": { "type": str, "default": "pandas"},
@@ -54,14 +54,14 @@ class DataframeNode(Node):
     def parameters(self) -> DataframeNodeParameters:
         return super().parameters
 
-        
+
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
         var_name = self.parameters.variable_name
         if self.parameters.module == "modin":
             import modin.pandas as pd
         else:
             import pandas as pd
-        
+
         if self.parameters.mode == "data":
             message.payload[var_name] = pd.DataFrame(self.parameters.data, self.parameters.columns)
         elif self.parameters.mode == "file":
@@ -88,10 +88,10 @@ class DataframeNode(Node):
             query = self.parameters.query
             if query is None:
                 raise ValueError("`query` must be spcified!")
-            
+
             message.payload[var_name] = pd.read_sql(query, message.payload[engine_name])
         
         return message
-    
+
     def to_script(self) -> str:
         return super().to_script()

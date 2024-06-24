@@ -14,14 +14,14 @@ class StartNode(Node):
     """
     Node for start point of Workflow
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [], [ "output" ], { "payload": { "type": dict, "default": {} } })
 
     @property
     def parameters(self) -> StartNodeParameters:
         return super().parameters
 
-        
+
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
         message.payload.update(self.parameters.payload)
 

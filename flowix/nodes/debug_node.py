@@ -17,7 +17,7 @@ class DebugNode(Node):
     """
     Node for print log to console
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [], {
             "object": { "type": str, "default": "message.payload"},
             "indent": { "type": int, "default": 4}
@@ -36,13 +36,13 @@ class DebugNode(Node):
                 object = eval(self.parameters.object)
             except:
                 raise ValueError("invalid object!")
-            
+
             try:
                 print(json.dumps(object, indent = self.parameters.indent))
             except:
                 pprint.pp(object, indent = self.parameters.indent)
-                
+
         return message
-    
+
     def to_script(self) -> str:
         return super().to_script()

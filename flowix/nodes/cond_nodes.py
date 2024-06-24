@@ -20,23 +20,23 @@ class IfNode(Node):
     """
     Node for checking cond
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output1", "output2" ], {
             "source": str,
             "separator": { "type": str, "default": "==" },
             "target": Any
         })
-    
+
     @property
     def parameters(self) -> IfNodeParameters:
         return super().parameters
-    
+
 
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
         source_name = self.parameters.source
         if source_name is None:
             raise ValueError("`source` must be specified!")
-        
+
         try:
             source = message.payload[source_name]
         except KeyError:
@@ -47,7 +47,7 @@ class IfNode(Node):
         self.outputs["output2"].enabled = not cond_result
 
         return message
-    
+
     def to_script(self) -> str:
         return super().to_script()
 
@@ -87,11 +87,11 @@ class ForNode(Node):
             "source": str,
             "iterable": { "type": Iterable, "default": [] }
         })
-    
+
     @property
     def parameters(self) -> ForNodeParameters:
         return super().parameters
-        
+
 
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
         if self.parameters.mode == "payload":
@@ -103,7 +103,7 @@ class ForNode(Node):
                 raise KeyError("invalie source key!")
         else:
             iterable = self.parameters.iterable
-            
+
         def check_break() -> bool:
             if self.workflow.state == "idle" or message is None:
                 return True
@@ -111,7 +111,7 @@ class ForNode(Node):
                 return True
 
             return False
-        
+
         max_iter = self.parameters.max_iter
         for iter_item in enumerate(iterable):
             if check_break():

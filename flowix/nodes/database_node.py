@@ -35,7 +35,7 @@ class DatabaseNode(Node):
     """
     Node for create SQLAlchemy Engine
     """
-    def __init__(self, workflow, node_id:str = None, node_name:str = None):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
             "variable_name": { "type": str, "default": "engine"},
             "type": str,
@@ -46,7 +46,7 @@ class DatabaseNode(Node):
     @property
     def parameters(self) -> DatabaseNodeParameters:
         return super().parameters
-        
+
 
     def compute(self, message:WorkflowMessage) -> WorkflowMessage:
         if self.parameters.type == "sqlite":
@@ -54,7 +54,7 @@ class DatabaseNode(Node):
         elif self.parameters.type in ( "mysql", "mariadb" ):
             if self.parameters.user is None or self.parameters.psswd is None or self.parameters.host is None:
                 raise ValueError("`user`, `psswd`, `host` parameter cannot be empty!")
-            
+
             engine = create_engine(URL.create(
                 "mysql+pymysql",
                 self.parameters.user, quote_plus(self.parameters.psswd),
@@ -64,7 +64,7 @@ class DatabaseNode(Node):
         elif self.parameters.type == "postgresql":
             if self.parameters.user is None or self.parameters.psswd is None or self.parameters.host is None:
                 raise ValueError("`user`, `psswd`, `host` parameter cannot be empty!")
-            
+
             engine = create_engine(URL.create(
                 "postgresql+psycopg",
                 self.parameters.user, quote_plus(self.parameters.psswd),
@@ -74,7 +74,7 @@ class DatabaseNode(Node):
         elif self.parameters.type == "oracle":
             if self.parameters.user is None or self.parameters.psswd is None or self.parameters.host is None:
                 raise ValueError("`user`, `psswd`, `host` parameter cannot be empty!")
-            
+
             engine = create_engine(URL.create(
                 "oracle+oracledb",
                 self.parameters.user, quote_plus(self.parameters.psswd),
@@ -84,7 +84,7 @@ class DatabaseNode(Node):
         elif self.parameters.type == "mssql":
             if self.parameters.user is None or self.parameters.psswd is None or self.parameters.host is None:
                 raise ValueError("`user`, `psswd`, `host` parameter cannot be empty!")
-            
+
             engine = create_engine(URL.create(
                 "mssql+pymssql",
                 self.parameters.user, quote_plus(self.parameters.psswd),
@@ -93,10 +93,10 @@ class DatabaseNode(Node):
             ))
         else:
             raise TypeError("invalid database type!")
-            
+
         message.payload[self.parameters.variable_name] = engine
         
         return message
-    
+
     def to_script(self) -> str:
         return super().to_script()
