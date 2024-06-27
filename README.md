@@ -12,7 +12,7 @@
     <a href="https://github.com/flowix-studio/Flowix-Core/blob/main/LICENSE">
         <img src="https://img.shields.io/github/license/flowix-studio/Flowix-Core.svg" alt="GPL-3.0 License" />
     </a>
-    <a href="https://pypi.org/project/nodered.py/">
+    <a href="https://pypi.org/project/flowix/">
         <img src="https://img.shields.io/pypi/v/flowix.svg" alt="pypi" />
     </a>
 </div><br><br>
