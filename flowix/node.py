@@ -80,7 +80,7 @@ class Node:
 
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, type | dict[Literal["type", "default"], Any]] = {}):
         self.__workflow = workflow
-        self.__node_id = node_id or self.__create_id
+        self.__node_id = node_id or self.__create_id()
         self.__name = node_name or f"{self.__class__.__name__}_{self.__node_id}"
 
         self.__parameters:NodeParameters = NodeParameters(parameters)
