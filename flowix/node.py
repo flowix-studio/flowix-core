@@ -99,9 +99,10 @@ class Node:
 
     def __create_id(self) -> str:
         nid = uuid.uuid4().hex[:5]
-        # check duplicated
-        if nid in self.__workflow.nodes.keys():
-            return self.__create_id
+        if self.__workflow is not None:
+            # check duplicated
+            if nid in self.__workflow.nodes.keys():
+                return self.__create_id()
         
         return nid
 
