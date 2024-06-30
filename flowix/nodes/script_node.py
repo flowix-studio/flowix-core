@@ -16,7 +16,7 @@ class ScriptNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
-            "script": { "type": str, "default": "# type code below\nreturn message"}
+            "script": { "type": "code", "default": "# type code below\nreturn message"}
         })
 
     @property

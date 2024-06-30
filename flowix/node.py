@@ -60,25 +60,24 @@ class NodeOutput:
         self.__connections.clear()
 
 class NodeParameters:
-    def __init__(self, parameter_info:dict[str, type | dict[Literal["type", "default"], Any]]):
-        self.__param_info = {}
+    def __init__(self, parameter_info:dict[str, dict[Literal["type", "default", "category"], str | Any]]):
+        self.__param_info:dict[str, dict[Literal["type", "default", "category"], str | Any]] = {}
         for name, info in parameter_info.items():
-            if isinstance(info, type):
-                self.__param_info[name] = info
-                setattr(self, name, None)
-            elif isinstance(info, dict):
-                self.__param_info[name] = info["type"]
-                setattr(self, name, info["default"])
+            info["default"] = info.pop("default", None)
+            info["category"] = info.pop("category", "common")
+
+            self.__param_info[name] = info
+            setattr(self, name, info["default"])
 
     @property
-    def info(self) -> dict[str, type | dict[Literal["type", "default"], type | Any]]:
+    def info(self) -> dict[str, dict[Literal["type", "default"], str | Any]]:
         return self.__param_info
 
 
 class Node:
     has_iter = False
 
-    def __init__(self, workflow = None, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, type | dict[Literal["type", "default"], Any]] = {}):
+    def __init__(self, workflow = None, node_id:str = None, node_name:str = None, inputs:list[str] = [ "input" ], outputs:list[str] = [ "output" ], parameters:dict[str, type | dict[Literal["type", "default", "category"], str | Any]] = {}):
         self.__workflow = workflow
         self.__node_id = node_id or self.__create_id()
         self.__name = node_name or f"{self.__class__.__name__}_{self.__node_id}"
@@ -194,3 +193,12 @@ class Node:
     @staticmethod
     def deserialize(source:str) -> "Node":
         return pickle.loads(codecs.decode(source.encode(), "base64"))
+    
+    # return as info(dict)
+    def info(self) -> dict:
+        return {
+            "class": self.__class__.__name__,
+            "parameters": self.parameters.info,
+            "inputs": list(set(self.inputs.keys())),
+            "outputs": list(set(self.outputs.keys()))
+        }

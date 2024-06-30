@@ -19,8 +19,8 @@ class DebugNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [], {
-            "object": { "type": str, "default": "message.payload"},
-            "indent": { "type": int, "default": 4}
+            "object": { "type": "str", "default": "message.payload" },
+            "indent": { "type": "int", "default": 4 }
         })
 
     @property

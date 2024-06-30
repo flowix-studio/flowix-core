@@ -30,11 +30,11 @@ class ExecNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
-            "variable_name": { "type": str, "default": "exec_result"},
-            "mode": { "type": str, "default": "shell"},
-            "command": list,
-            "target": str,
-            "arguments": list
+            "variable_name": { "type": "str", "default": "exec_result" },
+            "mode": { "type": "str", "default": "shell" },
+            "command": { "type": "list", "category": { "mode": "shell" } },
+            "target": { "type": "str", "category": { "mode": "program" } },
+            "arguments": { "type": "list", "category": { "mode": "program" } }
         })
 
     @property

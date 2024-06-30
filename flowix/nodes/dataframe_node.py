@@ -42,12 +42,12 @@ class DataframeNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
-            "variable_name": { "type": str, "default": "df"},
-            "module": { "type": str, "default": "pandas"},
-            "mode": { "type": str, "default": "data"},
-            "columns": { "type": list, "default": [] }, "data": { "type": list, "default": [] },
-            "file_type": { "type": str, "default": "csv"}, "source": str, "attrs": { "type": dict, "default": {} },
-            "engine": str, "query": str
+            "variable_name": { "type": "str", "default": "df" },
+            "module": { "type": "str", "default": "pandas" },
+            "mode": { "type": "str", "default": "data" },
+            "columns": { "type": "Iterable", "default": [], "category": { "mode": "data" } }, "data": { "type": "list", "default": [], "category": { "mode": "data" } },
+            "file_type": { "type": "str", "default": "csv", "category": { "mode": "file" } }, "source": { "type": "str", "category": { "mode": "file" } }, "attrs": { "type": "dict", "default": {}, "category": { "mode": "file" } },
+            "engine": { "type": "str", "category": { "mode": "query" } }, "query": { "type": "str", "category": { "mode": "query" } }
         })
 
     @property

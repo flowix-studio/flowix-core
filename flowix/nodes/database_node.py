@@ -37,10 +37,10 @@ class DatabaseNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
-            "variable_name": { "type": str, "default": "engine"},
-            "type": str,
-            "host": str, "port": int, "user": str, "psswd": str, "database": str,
-            "file": str
+            "variable_name": { "type": "str", "default": "engine"},
+            "type": { "type": "str" },
+            "host": { "type": "str", "category": { "mode": [ "mysql", "mariadb", "postgresql", "oracle", "mssql" ] } }, "port": { "type": "int", "category": { "mode": [ "mysql", "mariadb", "postgresql", "oracle", "mssql" ] } }, "user": { "type": "str", "category": { "mode": [ "mysql", "mariadb", "postgresql", "oracle", "mssql" ] } }, "psswd": { "type": "str", "category": { "mode": [ "mysql", "mariadb", "postgresql", "oracle", "mssql" ] } }, "database": { "type": "str", "category": { "mode": [ "mysql", "mariadb", "postgresql", "oracle", "mssql" ] } },
+            "file": { "type": "str", "category": { "mode": "sqlite" } }
         })
     
     @property

@@ -22,9 +22,9 @@ class IfNode(Node):
     """
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output1", "output2" ], {
-            "source": str,
-            "separator": { "type": str, "default": "==" },
-            "target": Any
+            "source": { "type": "str" },
+            "separator": { "type": "str", "default": "==" },
+            "target": { "type": "Any" }
         })
 
     @property
@@ -80,12 +80,12 @@ class ForNode(Node):
 
     def __init__(self, workflow = None, node_id:str = None, node_name:str = None):
         super().__init__(workflow, node_id, node_name, [ "input" ], [ "output" ], {
-            "variable_name": { "type": str, "default": "for_iter"},
-            "mode": { "type": str, "default": "payload"},
-            "index": { "type": bool, "default": False},
-            "max_iter": int,
-            "source": str,
-            "iterable": { "type": Iterable, "default": [] }
+            "variable_name": { "type": "str", "default": "for_iter"},
+            "mode": { "type": "str", "default": "payload"},
+            "index": { "type": "bool", "default": False},
+            "max_iter": { "type": "int" },
+            "source": { "type": "str", "category": { "mode": "payload" } },
+            "iterable": { "type": "Iterable", "default": [], "category": { "mode": "manual" } }
         })
 
     @property
