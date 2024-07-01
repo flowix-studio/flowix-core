@@ -197,6 +197,8 @@ class Node:
     # return as info(dict)
     def info(self) -> dict:
         return {
+            "id": self.__node_id,
+            "name": self.__name,
             "class": self.__class__.__name__,
             "parameters": self.parameters.info,
             "inputs": list(set(self.inputs.keys())),

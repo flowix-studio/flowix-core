@@ -409,3 +409,14 @@ class Workflow:
     @staticmethod
     def deserialize(source:str) -> "Workflow":
         return pickle.loads(codecs.decode(source.encode(), "base64"))
+
+    def info(self) -> dict:
+        return {
+            "id": self.__workflow_id,
+            "name": self.__workflow_name,
+            "nodes": [
+                node.info()
+                for node in self.__nodes
+            ],
+            "connections": self.connections
+        }

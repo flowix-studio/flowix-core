@@ -272,3 +272,13 @@ insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
 if __name__ == "__main__":
     {self.name}.execute("all")
 """
+
+    def info(self) -> dict:
+        return {
+            "id": self.__workspace_id,
+            "name": self.__workspace_name,
+            "workflows": [
+                workflow.info()
+                for workflow in self.__workflows
+            ]
+        }
