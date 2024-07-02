@@ -161,6 +161,8 @@ delete from `histories`;
         self.config_db.commit()
         # close connection
         self.config_db.close()
+
+        return True
         
     def save_as(self, workspace_file:str, overwrite:bool = False) -> bool:
         workspace_file:pathlib.Path = pathlib.Path(workspace_file).resolve()
@@ -212,6 +214,8 @@ insert into `config` values ('ID', '{self.id}'), ('NAME', '{self.name}');
         con.commit()
         # close connection
         con.close()
+
+        return True
 
     def append_workflow(self, workflow:Workflow) -> bool:
         try:
